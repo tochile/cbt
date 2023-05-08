@@ -1,4 +1,4 @@
-mysql_host: 'localhost'
-mysql_user: 'root'
-mysql_password: ''
-mysql_db: 'CBT'
+mysql_host: 'us-cdbr-east-06.cleardb.net'
+mysql_user: 'baf791952c5b40'
+mysql_password: '2bc90712'
+mysql_db: 'heroku_904e243587f6957'
