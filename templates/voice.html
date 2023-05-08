@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Voice Command Result</title>
+</head>
+<body>
+    {% if error %}
+        <p>{{ error }}</p>
+    {% else %}
+        <p>You said: "{{ command }}"</p>
+    {% endif %}
+</body>
+</html>
+
+
