@@ -1,13 +1,13 @@
+
+
 from __future__ import division, print_function
 
 from flask import Flask,render_template,url_for,request
 
 from flask_bootstrap import Bootstrap
-
-
-import os
 from flask_mysqldb import MySQL
 import yaml
+import os
 import random
 import string
 import time
@@ -32,7 +32,102 @@ with open('db.yaml') as f:
 @app.route('/', methods=['GET'])
 
 def index():
-    return render_template('questions.html')
+    return render_template('index.html')
+
+
+
+
+# define route for login page
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    engine = pyttsx3.init()
+    if request.method == 'POST':
+        # get user's voice command for username
+        engine.say('Please say your username.')
+        engine.runAndWait()
+        username = request.form['username']
+
+        # get user's voice command for password
+        engine.say('Please say your password.')
+        engine.runAndWait()
+        password = request.form['password']
+        
+        c = mysql.connection.cursor()
+
+        # check if username and password are valid
+        result = c.execute("SELECT * FROM users WHERE username=%s AND password=%s", [username, password])
+
+        if result:
+            # if username and password are valid, show success message
+            engine.say('Login successful.')
+            engine.runAndWait()
+            
+            
+                
+            result1 = c.execute("SELECT questions, options, option1, option2, answer FROM questions")
+            if(result1>0):
+                questions = c.fetchall()
+            return render_template('questions.html', questions=questions)
+        else:
+            # if username and password are invalid, show error message
+            engine.say('Invalid username or password.')
+            engine.runAndWait()
+            return 'Invalid username or password.'
+    else:
+        # if request method is GET, show login form
+        return '''
+            <form method="post">
+                <p>Username: <input type="text" name="username"></p>
+                <p>Password: <input type="password" name="password"></p>
+                <p><input type="submit" value="Login"></p>
+            </form>
+        '''
+
+@app.route('/question', methods=['POST','GET'])
+
+def question():
+    if request.method == 'POST':
+        question = request.form['question']
+        option1 = request.form['option1']
+        option2 = request.form['option2']
+        option3 = request.form['option3']
+        answer = request.form['answer']
+
+        cur = mysql.connection.cursor()
+        query = "INSERT INTO questions (questions,options,option1,option2,answer) VALUES (%s,%s,%s,%s,%s)"
+        cur.execute(query, (question,option1,option2,option3,answer ))
+        mysql.connection.commit()
+        cur.close()
+        marked = 'sucessful'
+        
+        
+        
+        return render_template('index.html', marked=marked)
+    
+    
+@app.route('/admin_login')
+
+def admin_login():
+    
+    return render_template('admin_login.html')
+
+@app.route('/ad_login', methods=['POST'])
+
+def ad_login():
+    
+    if request.method=='POST':
+    
+        username = request.form['username']
+        password = request.form['password']
+        cur = mysql.connection.cursor()
+        result = cur.execute("SELECT * from admin where binary username=%s and binary password=%s",[username,password])
+        if(result>0):
+            return render_template("dashboard.html", username=username)
+        else:
+            
+            error = 'failed'
+            return render_template("admin_login.html", error=error)
+
 
 @app.route('/fetch_questions')
 
@@ -119,3 +214,12 @@ def fetch_questions():
 
 
     return render_template('questions.html')
+  
+
+
+if __name__=='__main__':
+
+
+
+	app.run(debug=True)
+
