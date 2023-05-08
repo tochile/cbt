@@ -4,7 +4,10 @@ from flask import Flask,render_template,url_for,request
 
 from flask_bootstrap import Bootstrap
 
+
 import os
+from flask_mysqldb import MySQL
+import yaml
 import random
 import string
 import time
@@ -16,7 +19,15 @@ import speech_recognition as sr
 app = Flask(__name__)
 
 Bootstrap(app)
-
+with open('db.yaml') as f:
+    
+    db = yaml.load(f, Loader=yaml.FullLoader)
+   
+    app.config['MYSQL_HOST'] = db['mysql_host']
+    app.config['MYSQL_USER'] = db['mysql_user']
+    app.config['MYSQL_PASSWORD'] = db['mysql_password']
+    app.config['MYSQL_DB'] = db['mysql_db']
+    mysql = MySQL(app)
 
 @app.route('/', methods=['GET'])
 
